@@ -3,9 +3,9 @@
 import React from "react";
 import styled from "styled-components";
 
-// Sample output string
-const output =
-  "Arrive in Athens and check into your hotel\n- Visit the Acropolis and explore the ancient ruins, including the Parthenon\n- Walk around the historic Plaka neighborhood and enjoy traditional Greek cuisine at a local taverna\n\nDay 2:\n- Take a day trip to Delphi to visit the ancient archaeological site and the Temple of Apollo\n- Explore the archaeological museum in Delphi\n- Return to Athens in the evening and have dinner at a rooftop restaurant overlooking the city\n\nDay 3:\n- Catch a ferry to the island of Santorini\n- Visit the picturesque village of Oia and watch the sunset over the Aegean Sea\n- Explore the volcanic beaches and take a boat tour of the caldera\n\nDay 4:\n- Visit the ancient ruins of Akrotiri, an archaeological site that offers insight into the Minoan civilization\n- Relax on the black sand beaches of Perissa or Kamari\n- Explore the capital of Fira and wander through the narrow streets lined with white-washed buildings\n\nDay 5:\n- Take a morning ferry back to Athens\n- Visit the National Archaeological Museum to see artifacts from ancient Greece\n- Spend your final evening exploring the lively Monastiraki neighborhood and shopping at the flea market\n\nOptional activities throughout the trip:\n- Try traditional Greek dishes like moussaka, souvlaki, and baklava\n- Sample local wines from the region\n- Visit other historical sites in Athens, such as the Temple of Olympian Zeus or the Ancient Agora\n- Take a boat tour to the nearby islands of Mykonos or Naxos\n\nEnjoy your trip to Greece!";
+interface ItineraryComponentProps {
+  output: string;
+}
 
 // Styled components for styling the itinerary
 const Container = styled.div`
@@ -38,8 +38,7 @@ const OptionalHeading = styled.h3`
   margin-top: 10px;
 `;
 
-const IntineraryComponent: React.FC = () => {
-  // Split the output into an array of lines
+const ItineraryComponent: React.FC<ItineraryComponentProps> = ({ output }) => {
   const lines = output.split("\n");
 
   return (
@@ -63,4 +62,4 @@ const IntineraryComponent: React.FC = () => {
   );
 };
 
-export default IntineraryComponent;
+export default ItineraryComponent;

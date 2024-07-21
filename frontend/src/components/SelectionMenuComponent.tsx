@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import styled from "styled-components";
-import IntineraryComponent from "@/components/ItineraryComponent";
+import ItineraryComponent from "@/components/ItineraryComponent";
+import axios from "axios";
 
 const SearchBarWrapper = styled.div`
   width: 80%;
@@ -118,6 +119,18 @@ const ExpandButton = styled.button`
   }
 `;
 
+const Message = styled.div`
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: red;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 1000;
+`;
+
 const SearchBarComponent: React.FC = () => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -130,12 +143,60 @@ const SearchBarComponent: React.FC = () => {
   const [disability, setDisability] = useState(false);
   const [pets, setPets] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [displayIntinerary, setDisplayItinerary] = useState(false);
+  const [itinerary, setItinerary] = useState("");
+  const [displayItinerary, setDisplayItinerary] = useState(false);
+  const [messageVisible, setMessageVisible] = useState(false);
+  const endpoint = 'http://127.0.0.1:8000';
 
-  const handleSearch = () => {
-    // Implement the search functionality here
+  const handleSearch = async () => {
     console.log("Search:", { from, to, start, end, guests });
-    setDisplayItinerary(true);
+    // Check that all unhidden fields are non-empty
+    if (from === "" || to === "" || start === "" || end === "") {
+      setMessageVisible(true);
+      setTimeout(() => {
+        setMessageVisible(false);
+      }, 3000);
+      return;
+    }
+
+    try {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      const preferences = {
+        departureLocation: from,
+        returnLocation: to,
+        departureDate: start,
+        returnDate: end,
+        numDays: diffDays,
+        numPeople: guests,
+        priceMax: budget,
+        busyLevel: activityLevel,
+        hasAllergy: allergy,
+        isDisability: disability,
+        pets: pets
+      };
+      console.log(preferences);
+
+      const response = await axios.get(`${endpoint}/get-itinerary`, {
+        params: {
+          preferences: JSON.stringify(preferences)
+        }
+      });
+
+      if (response.status === 200) {
+        const { flight_hotels, itinerary } = response.data;
+        console.log(flight_hotels)
+        // setFlightHotels(flight_hotels);
+        console.log(itinerary)
+        setItinerary(itinerary.itinerary.toString());
+        setDisplayItinerary(true);
+      }
+    } catch (e) {
+      console.log(`Unable to search due to ${e}`);
+    }
   };
 
   const toggleExpand = () => {
@@ -159,8 +220,8 @@ const SearchBarComponent: React.FC = () => {
           <SearchField>
             <Label htmlFor="to">To</Label>
             <Input
-              type="to"
-              id="location"
+              type="text"
+              id="to"
               placeholder="Go where?"
               value={to}
               onChange={(e) => setTo(e.target.value)}
@@ -181,7 +242,7 @@ const SearchBarComponent: React.FC = () => {
             <Input
               type="date"
               id="end"
-              placeholder="Choose date"
+              placeholder="Choose end date"
               value={end}
               onChange={(e) => setEnd(e.target.value)}
             />
@@ -201,7 +262,7 @@ const SearchBarComponent: React.FC = () => {
             </Select>
           </SearchField>
           <div>
-            .<Button onClick={handleSearch}>Search</Button>
+            <Button onClick={handleSearch}>Search</Button>
           </div>
         </MainFieldsWrapper>
         {isExpanded && (
@@ -214,6 +275,7 @@ const SearchBarComponent: React.FC = () => {
                   type="number"
                   id="budget"
                   placeholder="Enter your maximum budget"
+                  value={budget}
                   onChange={(e) => setBudget(Number(e.target.value))}
                 />
               </HalfWidthField>
@@ -273,7 +335,10 @@ const SearchBarComponent: React.FC = () => {
           {isExpanded ? "Show Less" : "Show More"}
         </ExpandButton>
       </SearchBarWrapper>
-      {displayIntinerary && <IntineraryComponent />}
+      {displayItinerary && itinerary && (
+        <ItineraryComponent output={itinerary} />
+      )}
+      {messageVisible && <Message>Please fill in all required fields.</Message>}
     </div>
   );
 };
