@@ -18,6 +18,13 @@ const Container = styled.div`
   line-height: 1.6;
 `;
 
+const Heading = styled.h2`
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+`;
+
 const DayHeading = styled.h2`
   color: #2c3e50;
   margin-top: 20px;
@@ -43,6 +50,7 @@ const ItineraryComponent: React.FC<ItineraryComponentProps> = ({ output }) => {
 
   return (
     <Container>
+      <Heading>Itinerary</Heading>
       {lines.map((line, index) => {
         if (line.startsWith("Day")) {
           return <DayHeading key={index}>{line}</DayHeading>;

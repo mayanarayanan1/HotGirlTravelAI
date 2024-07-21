@@ -1,5 +1,6 @@
 "use client";
 
+import Head from "next/head";
 import React from "react";
 import styled from "styled-components";
 
@@ -17,6 +18,13 @@ const Container = styled.div`
   line-height: 1.6;
 `;
 
+const Heading = styled.h2`
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+`;
+
 const FlightItem = styled.div`
   margin-bottom: 20px;
 `;
@@ -27,14 +35,10 @@ const AirlineLogo = styled.img`
   margin-top: 10px;
 `;
 
-const Category = styled.div`
-  font-weight: bold;
-  margin-top: 10px;
-`;
-
 const FlightComponent: React.FC<FlightComponentProps> = ({ flights }) => {
   return (
     <Container>
+      <Heading>Flights</Heading>
       {flights.map((flight, index) => (
         <FlightItem key={index}>
           {flight.startsWith('Airline Logo: ') ? (

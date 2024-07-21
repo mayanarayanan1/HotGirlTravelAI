@@ -7,7 +7,6 @@ interface HotelComponentProps {
   hotels: string[];
 }
 
-// Styled components for styling the hotel list
 const Container = styled.div`
   font-family: Arial, sans-serif;
   margin: 20px;
@@ -16,6 +15,13 @@ const Container = styled.div`
   border-radius: 8px;
   max-width: 600px;
   line-height: 1.6;
+`;
+
+const Heading = styled.h2`
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
 `;
 
 const HotelItem = styled.div`
@@ -27,6 +33,7 @@ const Category = styled.div`
   color: #2c3e50;
   font-weight: bold;
   margin-top: 10px;
+  text-decoration: underline;
 `;
 
 const Name = styled.div`
@@ -48,17 +55,24 @@ const Link = styled.a`
   }
 `;
 
+const toTitleCase = (str: string) => {
+  return str
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, (str) => str.toUpperCase());
+};
+
 const HotelComponent: React.FC<HotelComponentProps> = ({ hotels }) => {
   return (
     <Container>
+      <Heading>Hotels</Heading>
       {hotels.map((hotel, index) => (
         <HotelItem key={index}>
           {hotel.startsWith('Category:') ? (
-            <Category>{hotel}</Category>
+            <Category>{toTitleCase(hotel.replace('Category: ', ''))}</Category>
           ) : hotel.startsWith('Name:') ? (
-            <Name>{hotel}</Name>
+            <Name>{hotel.replace('Name: ', '')}</Name>
           ) : hotel.startsWith('Description:') ? (
-            <Description>{hotel}</Description>
+            <Description>{hotel.replace('Description: ', '')}</Description>
           ) : hotel.startsWith('Link:') ? (
             <Link href={hotel.replace('Link: ', '')} target="_blank" rel="noopener noreferrer">
               Visit Website

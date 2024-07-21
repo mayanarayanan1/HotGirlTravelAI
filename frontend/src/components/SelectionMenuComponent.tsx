@@ -197,16 +197,19 @@ const SearchBarComponent: React.FC = () => {
   const [itinerary, setItinerary] = useState("");
   const [displayItinerary, setDisplayItinerary] = useState(false);
   const [messageVisible, setMessageVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const endpoint = 'http://127.0.0.1:8000';
 
   const handleSearch = async () => {
     console.log("Search:", { from, to, start, end, guests });
+    setIsLoading(true);
     // Check that all unhidden fields are non-empty
     if (from === "" || to === "" || start === "" || end === "") {
       setMessageVisible(true);
       setTimeout(() => {
         setMessageVisible(false);
       }, 3000);
+      setIsLoading(false);
       return;
     }
 
@@ -278,6 +281,8 @@ const SearchBarComponent: React.FC = () => {
       }
     } catch (e) {
       console.log(`Unable to search due to ${e}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -344,7 +349,13 @@ const SearchBarComponent: React.FC = () => {
             </Select>
           </SearchField>
           <div>
-            <Button onClick={handleSearch}>Search</Button>
+            <Button onClick={handleSearch} disabled={isLoading}>
+              {isLoading ? (
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              ) : (
+                'Search'
+              )}
+            </Button>
           </div>
         </MainFieldsWrapper>
         {isExpanded && (

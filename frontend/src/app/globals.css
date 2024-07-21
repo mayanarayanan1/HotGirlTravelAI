@@ -4,8 +4,10 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255; /* Set to white */
-  --background-end-rgb: 255, 255, 255;   /* Set to white */
+  --background-start-rgb: 255, 255, 255;
+  /* Set to white */
+  --background-end-rgb: 255, 255, 255;
+  /* Set to white */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,8 +32,27 @@ input {
   border-radius: 5px;
   margin-top: 5px;
   font-size: 1rem;
-  width: 100%; /* Ensure input takes the full width of the parent */
-  color: black; /* Set input text color to black */
+  width: 100%;
+  /* Ensure input takes the full width of the parent */
+  color: black;
+  /* Set input text color to black */
+}
+
+.spinner-border {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  vertical-align: text-bottom;
+  border: 0.25em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @layer utilities {
