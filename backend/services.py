@@ -23,7 +23,7 @@ def get_nearby_airports(latitude, longitude, distance):
             if isinstance(airport, dict):
                 airport_name = airport.get('nameAirport')
                 airport_code = airport.get('codeIataAirport')
-                if airport_name and airport_code:
+                if airport_name and airport_code and "International" in airport_name:
                     airports.append((airport_name, airport_code))
             else:
                 print(f"Unexpected item type: {type(airport)}, value: {airport}")
@@ -35,39 +35,39 @@ def get_nearby_airports(latitude, longitude, distance):
 def get_flights(flightPref):
     lat, lng = get_coordinates(flightPref["departureLocation"])
     departure_airports = get_nearby_airports(lat, lng, 30)
-    departure_airports = departure_airports[0]
     
     lat, lng = get_coordinates(flightPref["returnLocation"])
     arrival_airports = get_nearby_airports(lat, lng, 30)
-    arrival_airports = arrival_airports[0]
 
     all_flights = []
 
-    params = {
-        "engine": "google_flights",
-        "departure_id": departure_airports[1],
-        "arrival_id": arrival_airports[1],
-        "outbound_date": flightPref["departureDate"],
-        "return_date": flightPref["returnDate"],
-        "currency": "USD",
-        "hl": "en",
-        "api_key": api_key,
-        "adults": flightPref["numPeople"],
-        "max_price": flightPref["priceMax"]
-    }
+    for departure_airport in departure_airports:
+        for arrival_airport in arrival_airports:
+            params = {
+                "engine": "google_flights",
+                "departure_id": departure_airport[1],
+                "arrival_id": arrival_airport[1],
+                "outbound_date": flightPref["departureDate"],
+                "return_date": flightPref["returnDate"],
+                "currency": "USD",
+                "hl": "en",
+                "api_key": api_key,
+                "adults": flightPref["numPeople"],
+                "max_price": flightPref["priceMax"]
+            }
 
-    search = GoogleSearch(params)
-    results = search.get_dict()
-    print(results)
-    try:
-        flights = results["best_flights"]
-    except KeyError:
-        try:
-            flights = results["other_flights"]
-        except KeyError:
-            flights = []
+            search = GoogleSearch(params)
+            results = search.get_dict()
 
-    all_flights.extend(flights)
+            try:
+                flights = results["best_flights"]
+            except KeyError:
+                try:
+                    flights = results["other_flights"]
+                except KeyError:
+                    flights = []
+
+            all_flights.extend(flights)
 
     return all_flights
 
@@ -135,7 +135,7 @@ def update_preferences(price, busy):
     return itinerary_pref
 
 # Test the functions directly
-api_key = "10c580118550025eeb8c5be82b42626dcef9d5811d3cd495e0d6e2fe88de1906"
+api_key = "2da3e48e52a5a249c804e194869fb42113e54443efe808f15c42e1a90fdf323b"
 
 # if __name__ == "__main__":
 #     preferences = {
