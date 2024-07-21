@@ -68,8 +68,7 @@ async def generate_itinerary():
     days = preferences["numDays"]
     numPeople = preferences["numPeople"]
     busyLevel = preferences["busyLevel"]
-    # dietary = preferences["dietary"]
-    dietary = "vegan"
+    dietary = preferences["dietary"]
 
     # Example: Prepare prompt for GPT-4
     prompt = f"Create a {days}-day travel itinerary for {destination}. I am traveling with {numPeople}. On a scale of 1-5, I want the level of busyness to be {busyLevel}. When including the itinerary for food places, please take into account these dietary needs {dietary}."

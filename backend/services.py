@@ -25,7 +25,6 @@ def get_flights(flightPref):
         except KeyError:
             return []
     
-
 def get_hotels(hotel_pref):
     location = hotel_pref['returnLocation']
     amenities = []
