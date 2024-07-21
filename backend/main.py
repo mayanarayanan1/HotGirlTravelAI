@@ -2,10 +2,6 @@ import fastapi
 import requests
 from serpapi import GoogleSearch
 
-flightPrefs = dict()
-hotelPrefs = dict()
-itineraryPrefs = dict()
-
 def get_flights(flightPref):
     # Get Google Flights API
     price_min = 500
@@ -57,39 +53,34 @@ def get_hotels(hotel_pref):
     return recommended
 
 def get_flight_pref(preferences):
-    global flightPrefs
     attributes = ['departureDate', 'departureLocation', 'returnDate', 'returnLocation', 'priceMax', 'numPeople']
     flight_pref = {}
     for attribute in attributes:
         if attribute in preferences:
             flight_pref[attribute] = preferences[attribute]
-    flightPrefs = flight_pref
     return flight_pref
 def get_hotel_pref(preferences):
-    global hotelPrefs
     attributes = ['location', 'arrivalDate', 'leaveDate', 'numPeople', 'priceMin', 'priceMax', 'pets']
     hotel_pref = {}
     for attribute in attributes:
         if attribute in preferences:
             hotel_pref[attribute] = preferences[attribute]
-    hotelPrefs = hotel_pref
     return hotel_pref
 def get_itinerary_pref(preferences):
-    global itineraryPrefs
     attributes = ['busyLevel', 'isDisability', 'dietary', 'numPeople', 'numDays']
     itinerary_pref = {}
     for attribute in attributes:
         if attribute in preferences:
             itinerary_pref[attribute] = preferences[attribute]
-    itineraryPrefs = itinerary_pref
     return itinerary_pref
 
-def update_preferences(price, busyLevel):
-    if price > 0:
-        flightPrefs['max_price'] = price
-        hotelPrefs['max_price'] = price
-    if busyLevel > 0:
-        itineraryPrefs['busyLevel'] = busyLevel
+def update_preferences(preferences):
+    attributes = ['priceMax', 'busyLevel']
+    itinerary_pref = {}
+    for attribute in attributes:
+        if attribute in preferences:
+            itinerary_pref[attribute] = preferences[attribute]
+    return itinerary_pref
 
 # Test the functions directly
 api_key = "61e88bc6c438b34f1dcc3391824a0466ca2bfcc4fe6c0e1821a7913d0a5704be"
@@ -108,11 +99,9 @@ if __name__ == "__main__":
     hotel_data = get_hotels(hotel_pref)
     print("Hotel Data:", hotel_data)
 
-if __name__ == "__main__":
     prefs = {'departureDate' : "2024-08-01", 'departureLocation' : "JFK", 'returnDate' : "2024-08-05", 
              'returnLocation' : "LAX", 'priceMax' : 1500, 'numPeople' : 3}
     flight_prefs = get_flight_pref(prefs)
     flights = get_flights(flight_prefs)
     print(flights)
-    print(flightPrefs)
 
