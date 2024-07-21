@@ -18,7 +18,7 @@ def get_flights(flightPref):
     search = GoogleSearch(params)
     results = search.get_dict()
     try: 
-        return results["best_flights"][0]
+        return results["best_flights"]
     except KeyError: 
         try:
             return results["other_flights"][0]

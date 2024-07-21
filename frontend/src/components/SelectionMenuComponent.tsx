@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import ItineraryComponent from "@/components/ItineraryComponent";
 import HotelComponent from "@/components/HotelComponent"
+import FlightComponent from "./FlightComponent";
 import axios from "axios";
 
 interface Hotel {
@@ -15,7 +16,42 @@ interface Hotel {
     latitude: number;
     longitude: number;
   };
-  // Add any other fields you may have
+}
+
+interface FlightDetails {
+  airline: string;
+  airline_logo: string;
+  airplane: string;
+  arrival_airport: {
+    name: string;
+    id: string;
+    time: string;
+  };
+  departure_airport: {
+    name: string;
+    id: string;
+    time: string;
+  };
+  duration: number;
+  extensions: string[];
+  flight_number: string;
+  legroom: string;
+  travel_class: string;
+}
+
+interface Flight {
+  airline_logo: string;
+  carbon_emissions: {
+    this_flight: number;
+    typical_for_this_route: number;
+    difference_percent: number;
+  };
+  departure_token: string;
+  extensions: string[];
+  flights: FlightDetails[];
+  price: number;
+  total_duration: number;
+  type: string;
 }
 
 const SearchBarWrapper = styled.div`
@@ -156,7 +192,7 @@ const SearchBarComponent: React.FC = () => {
   const [disability, setDisability] = useState(false);
   const [pets, setPets] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [flights, setFlights] = useState("");
+  const [flights, setFlights] = useState<string[]>([]);
   const [hotels, setHotels] = useState<string[]>([]);
   const [itinerary, setItinerary] = useState("");
   const [displayItinerary, setDisplayItinerary] = useState(false);
@@ -193,7 +229,6 @@ const SearchBarComponent: React.FC = () => {
         isDisability: disability,
         pets: pets
       };
-      console.log(preferences);
 
       const response = await axios.get(`${endpoint}/get-itinerary`, {
         params: {
@@ -204,9 +239,30 @@ const SearchBarComponent: React.FC = () => {
       if (response.status === 200) {
         const { flight_hotels, itinerary } = response.data;
         const { flights, hotels } = flight_hotels;
-        console.log(flights)
-        console.log(hotels)
-        // setFlights();
+
+        const flightStrings: string[] = [];
+        for (const flight of flights) {
+          const flightData = flight as Flight;
+          flightStrings.push(`Airline Logo: ${flightData.airline_logo}`);
+          flightStrings.push(`Price: $${flightData.price}`);
+          flightStrings.push(`Total Duration: ${flightData.total_duration} minutes`);
+          flightStrings.push(`Extensions: ${flightData.extensions?.join(', ') || 'None'}`);
+          flightStrings.push(`Carbon Emissions: This flight - ${flightData.carbon_emissions.this_flight}g, Typical for this route - ${flightData.carbon_emissions.typical_for_this_route}g, Difference - ${flightData.carbon_emissions.difference_percent}%`);
+          flightData.flights.forEach((detail, idx) => {
+            flightStrings.push(`Flight Number: ${detail.flight_number}`);
+            flightStrings.push(`Airline: ${detail.airline}`);
+            flightStrings.push(`Airplane: ${detail.airplane}`);
+            flightStrings.push(`Departure Airport: ${detail.departure_airport.name} (${detail.departure_airport.id}) at ${detail.departure_airport.time}`);
+            flightStrings.push(`Arrival Airport: ${detail.arrival_airport.name} (${detail.arrival_airport.id}) at ${detail.arrival_airport.time}`);
+            flightStrings.push(`Duration: ${detail.duration} minutes`);
+            flightStrings.push(`Legroom: ${detail.legroom}`);
+            flightStrings.push(`Travel Class: ${detail.travel_class}`);
+            flightStrings.push(`Extensions: ${detail.extensions.join(', ')}`);
+          });
+          flightStrings.push('');
+        }
+        setFlights(flightStrings);
+
         const hotelStrings = [];
         for (const [key, hotel] of Object.entries(hotels)) {
           const hotelData = hotel as Hotel;
@@ -214,7 +270,7 @@ const SearchBarComponent: React.FC = () => {
           hotelStrings.push(`Name: ${hotelData.name}`);
           hotelStrings.push(`Description: ${hotelData.description}`);
           hotelStrings.push(`Link: ${hotelData.link}`);
-          hotelStrings.push(''); // Add a blank line for separation
+          hotelStrings.push('');
         }
         setHotels(hotelStrings);
         setItinerary(itinerary.itinerary.toString());
@@ -361,6 +417,9 @@ const SearchBarComponent: React.FC = () => {
           {isExpanded ? "Show Less" : "Show More"}
         </ExpandButton>
       </SearchBarWrapper>
+      {displayItinerary && itinerary && (
+        <FlightComponent flights={flights} />
+      )}
       {displayItinerary && itinerary && (
         <HotelComponent hotels={hotels} />
       )}
