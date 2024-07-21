@@ -19,6 +19,13 @@ const Logo = styled.div`
   font-weight: bold;
 `;
 
+const Tagline = styled.span`
+  margin-left: 20px;
+  font-size: 1rem;
+  color: #ff69b4;
+  font-weight: bold;
+`;
+
 const Nav = styled.nav`
   display: flex;
   align-items: center;
@@ -40,12 +47,13 @@ const NavLink = styled.a`
 const HeaderComponent: React.FC = () => (
   <HeaderWrapper>
     <Logo>HotGirlTravel.ai</Logo>
+    <Tagline>AI-Powered Travel Agent</Tagline>
     <Nav>
       <NavLink href="#">Home</NavLink>
       <NavLink href="#">About Us</NavLink>
       <NavLink href="#">My Trips</NavLink>
     </Nav>
-  </HeaderWrapper>
+  </HeaderWrapper >
 );
 
 export default HeaderComponent;

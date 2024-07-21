@@ -83,6 +83,13 @@ const AdditionalFieldsWrapper = styled.div`
   margin-top: 20px;
 `;
 
+const Title = styled.h1`
+  color: #ff69b4;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  text-align: center;
+`;
+
 const SearchField = styled.div`
   display: flex;
   flex-direction: column;
@@ -115,7 +122,7 @@ const Select = styled.select`
 
 const Button = styled.button`
   padding: 10px 20px;
-  background-color: #333;
+  background-color: #ff69b4; /* HotPink color */
   color: white;
   border: none;
   border-radius: 5px;
@@ -127,7 +134,7 @@ const Button = styled.button`
   height: 50px;
 
   &:hover {
-    background-color: #555;
+    background-color: #ff1493; /* DeepPink color */
   }
 `;
 
@@ -155,7 +162,7 @@ const HalfWidthField = styled.div`
 
 const ExpandButton = styled.button`
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #ff69b4; /* HotPink color */
   color: white;
   border: none;
   border-radius: 5px;
@@ -163,7 +170,7 @@ const ExpandButton = styled.button`
   margin-top: 20px; /* Add space below the button */
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #ff1493; /* DeepPink color */
   }
 `;
 
@@ -332,6 +339,7 @@ const SearchBarComponent: React.FC = () => {
 
   return (
     <div>
+      <Title>Find Your Perfect Vacation!</Title>
       <SearchBarWrapper>
         <MainFieldsWrapper>
           <SearchField>
