@@ -68,19 +68,27 @@ async def generate_itinerary():
     days = preferences["numDays"]
     numPeople = preferences["numPeople"]
     busyLevel = preferences["busyLevel"]
-    dietary = preferences["dietary"]
+    dietary = (preferences["dietary"])
+    cuisine = preferences["cuisine"]
 
     # Example: Prepare prompt for GPT-4
-    prompt = f"Create a {days}-day travel itinerary for {destination}. I am traveling with {numPeople}. On a scale of 1-5, I want the level of busyness to be {busyLevel}. When including the itinerary for food places, please take into account these dietary needs {dietary}."
+    prompt = f"Create a {days}-day travel itinerary for {destination}. I am traveling with {numPeople}. On a scale of 1-5, I want the level of busyness to be {busyLevel}. When including the itinerary for food places, I prefer the following cuisines: {cuisine}. Please take into account these dietary needs {dietary}."
     if preferences["isDisability"]:
         prompt += "When creating this itinerary, please take into account that I have a disability."
     try:
-        response = client.chat.completions.create(model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=500)
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant. Please display your output in the following format:\n"
+                                              "Day 1: Description\n"
+                                              "- Morning: activity\n"
+                                              "- Afternoon: activity\n"
+                                              "- Dinner: activity\n"
+                                              "Repeat this for each day of the trip."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=500
+        )
         itinerary = response.choices[0].message.content.strip()
     except openai.OpenAIError as e:
          raise HTTPException(status_code=500, detail=f"Error generating itinerary: {str(e)}")

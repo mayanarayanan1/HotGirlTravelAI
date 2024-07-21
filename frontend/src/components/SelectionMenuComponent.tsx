@@ -189,6 +189,7 @@ const SearchBarComponent: React.FC = () => {
   const [budget, setBudget] = useState(5000);
   const [activityLevel, setActivityLevel] = useState(3);
   const [allergy, setAllergy] = useState("");
+  const [cuisine, setCuisine] = useState("");
   const [disability, setDisability] = useState(false);
   const [pets, setPets] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -229,6 +230,7 @@ const SearchBarComponent: React.FC = () => {
         priceMax: budget,
         busyLevel: activityLevel,
         dietary: allergy,
+        cuisine: cuisine,
         isDisability: disability,
         pets: pets
       };
@@ -429,7 +431,16 @@ const SearchBarComponent: React.FC = () => {
                   onChange={(e) => setAllergy(e.target.value)}
                 />
               </div>
-
+              <div>
+                <Label htmlFor="cuisine">Preferred Cuisines?</Label>
+                <Input
+                  type="text"
+                  id="cuisine"
+                  placeholder="Enter your preferred cuisines"
+                  value={cuisine}
+                  onChange={(e) => setCuisine(e.target.value)}
+                />
+              </div>
             </CheckboxWrapper>
           </AdditionalFieldsWrapper>
         )}
