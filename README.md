@@ -18,12 +18,14 @@ npm install
 ```
   
 ## Run the Application: 
-To run frontend in `/frontend/src`:
+To run frontend:
 ```
+cd frontend/src
 npm run
 ```
 
 To run backend in `/backend`:
 ```
+cd backend
 uvicorn main:app --reload
 ```
