@@ -99,4 +99,5 @@ async def generate_itinerary():
 async def update_user_preferences(price: int, busy: int):
     global user_preferences
     user_preferences = update_preferences(price, busy)
-    return {"message": "Preferences updated successfully"}
+    itinerary = await generate_itinerary()
+    return itinerary

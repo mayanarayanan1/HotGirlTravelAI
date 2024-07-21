@@ -3,9 +3,10 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import ItineraryComponent from "@/components/ItineraryComponent";
-import HotelComponent from "@/components/HotelComponent"
+import HotelComponent from "@/components/HotelComponent";
 import FlightComponent from "./FlightComponent";
 import axios from "axios";
+import EditPreferencesComponent from "./EditPreferencesComponent";
 
 interface Hotel {
   type: string;
@@ -55,22 +56,21 @@ interface Flight {
 }
 
 const SearchBarWrapper = styled.div`
-  width: 80%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20px 0;
   padding: 20px;
   background: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   max-width: 1600px; /* Set a max width for the component */
-  position: relative; /* To position the Show More button */
 `;
 
 const MainFieldsWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
   width: 100%;
   flex-wrap: nowrap;
   gap: 10px;
@@ -138,7 +138,9 @@ const Icon = styled.span`
 const CheckboxWrapper = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Distribute space evenly between children */
   margin-top: 10px;
+  width: 100%; /* Ensure the wrapper takes full width */
 `;
 
 const HalfWidthWrapper = styled.div`
@@ -158,10 +160,7 @@ const ExpandButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  position: absolute;
-  bottom: -20px; /* Position below the component */
-  right: 20px; /* Align to the right */
-  transform: translateY(100%); /* Move it below the component */
+  margin-top: 20px; /* Add space below the button */
 
   &:hover {
     background-color: #0056b3;
@@ -199,7 +198,7 @@ const SearchBarComponent: React.FC = () => {
   const [displayItinerary, setDisplayItinerary] = useState(false);
   const [messageVisible, setMessageVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const endpoint = 'http://127.0.0.1:8000';
+  const endpoint = "http://127.0.0.1:8000";
 
   const handleSearch = async () => {
     console.log("Search:", { from, to, start, end, guests });
@@ -232,13 +231,13 @@ const SearchBarComponent: React.FC = () => {
         dietary: allergy,
         cuisine: cuisine,
         isDisability: disability,
-        pets: pets
+        pets: pets,
       };
 
       const response = await axios.get(`${endpoint}/get-itinerary`, {
         params: {
-          preferences: JSON.stringify(preferences)
-        }
+          preferences: JSON.stringify(preferences),
+        },
       });
 
       if (response.status === 200) {
@@ -256,21 +255,31 @@ const SearchBarComponent: React.FC = () => {
           const flightData = flight as Flight;
           flightStrings.push(`Airline Logo: ${flightData.airline_logo}`);
           flightStrings.push(`Price: $${flightData.price}`);
-          flightStrings.push(`Total Duration: ${formatDuration(flightData.total_duration)}`);
-          flightStrings.push(`Extensions: ${flightData.extensions?.join(', ') || 'None'}`);
-          flightStrings.push(`Carbon Emissions: This flight - ${flightData.carbon_emissions.this_flight}g, Typical for this route - ${flightData.carbon_emissions.typical_for_this_route}g, Difference - ${flightData.carbon_emissions.difference_percent}%`);
+          flightStrings.push(
+            `Total Duration: ${formatDuration(flightData.total_duration)}`
+          );
+          flightStrings.push(
+            `Extensions: ${flightData.extensions?.join(", ") || "None"}`
+          );
+          flightStrings.push(
+            `Carbon Emissions: This flight - ${flightData.carbon_emissions.this_flight}g, Typical for this route - ${flightData.carbon_emissions.typical_for_this_route}g, Difference - ${flightData.carbon_emissions.difference_percent}%`
+          );
           flightData.flights.forEach((detail, idx) => {
             flightStrings.push(`Flight Number: ${detail.flight_number}`);
             flightStrings.push(`Airline: ${detail.airline}`);
             flightStrings.push(`Airplane: ${detail.airplane}`);
-            flightStrings.push(`Departure Airport: ${detail.departure_airport.name} (${detail.departure_airport.id}) at ${detail.departure_airport.time}`);
-            flightStrings.push(`Arrival Airport: ${detail.arrival_airport.name} (${detail.arrival_airport.id}) at ${detail.arrival_airport.time}`);
+            flightStrings.push(
+              `Departure Airport: ${detail.departure_airport.name} (${detail.departure_airport.id}) at ${detail.departure_airport.time}`
+            );
+            flightStrings.push(
+              `Arrival Airport: ${detail.arrival_airport.name} (${detail.arrival_airport.id}) at ${detail.arrival_airport.time}`
+            );
             flightStrings.push(`Duration: ${detail.duration} minutes`);
             flightStrings.push(`Legroom: ${detail.legroom}`);
             flightStrings.push(`Travel Class: ${detail.travel_class}`);
-            flightStrings.push(`Extensions: ${detail.extensions.join(', ')}`);
+            flightStrings.push(`Extensions: ${detail.extensions.join(", ")}`);
           });
-          flightStrings.push('');
+          flightStrings.push("");
         }
         setFlights(flightStrings);
 
@@ -281,9 +290,32 @@ const SearchBarComponent: React.FC = () => {
           hotelStrings.push(`Name: ${hotelData.name}`);
           hotelStrings.push(`Description: ${hotelData.description}`);
           hotelStrings.push(`Link: ${hotelData.link}`);
-          hotelStrings.push('');
+          hotelStrings.push("");
         }
         setHotels(hotelStrings);
+        setItinerary(itinerary.itinerary.toString());
+        setDisplayItinerary(true);
+      }
+    } catch (e) {
+      console.log(`Unable to search due to ${e}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateSearch = async () => {
+    setIsLoading(true);
+    setDisplayItinerary(false);
+    try {
+      const response = await axios.get(`${endpoint}/update-preferences`, {
+        params: {
+          price: budget,
+          busy: activityLevel,
+        },
+      });
+
+      if (response.status === 200) {
+        const { itinerary } = response.data;
         setItinerary(itinerary.itinerary.toString());
         setDisplayItinerary(true);
       }
@@ -359,9 +391,13 @@ const SearchBarComponent: React.FC = () => {
           <div>
             <Button onClick={handleSearch} disabled={isLoading}>
               {isLoading ? (
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
               ) : (
-                'Search'
+                "Search"
               )}
             </Button>
           </div>
@@ -395,15 +431,6 @@ const SearchBarComponent: React.FC = () => {
                 </Select>
               </HalfWidthField>
             </HalfWidthWrapper>
-            {/* <SearchField>
-            <Label htmlFor="preferences">Preferences</Label>
-            <Input
-              type="text"
-              id="preferences"
-              placeholder="Any preferences?"
-              onChange={(e) => console.log("Preferences:", e.target.value)}
-            />
-          </SearchField> */}
             <CheckboxWrapper>
               <div>
                 <Label htmlFor="pets">Traveling with pets?</Label>
@@ -448,14 +475,24 @@ const SearchBarComponent: React.FC = () => {
           {isExpanded ? "Show Less" : "Show More"}
         </ExpandButton>
       </SearchBarWrapper>
-      {displayItinerary && itinerary && (
-        <FlightComponent flights={flights} />
-      )}
-      {displayItinerary && itinerary && (
-        <HotelComponent hotels={hotels} />
-      )}
+      {displayItinerary && itinerary && <FlightComponent flights={flights} />}
+      {displayItinerary && itinerary && <HotelComponent hotels={hotels} />}
       {displayItinerary && itinerary && (
         <ItineraryComponent output={itinerary} />
+      )}
+
+      {displayItinerary && itinerary && (
+        <EditPreferencesComponent
+          budget={budget}
+          setBudget={setBudget}
+          activityLevel={activityLevel}
+          setActivityLevel={setActivityLevel}
+          button={
+            <Button onClick={handleUpdateSearch} disabled={isLoading}>
+              Update
+            </Button>
+          }
+        />
       )}
       {messageVisible && <Message>Please fill in all required fields.</Message>}
     </div>
