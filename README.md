@@ -7,17 +7,23 @@
 - Jacqueline Cai
 
 ## Prerequisites:
-- pip install openai
-- pip install fastapi
-- pip install google-search-results
-- pip install dotenv
-  
-## Usage 
-To run frontend:
- - cd frontend/src
- - npm install
- - npm run 
+```
+cd backend
+pip install -r requirements.txt
+```
 
-To run backend:
-- cd backend
-- uvicorn main:app --reload
+```
+cd frontend/src
+npm install
+```
+  
+## Run the Application: 
+To run frontend in `/frontend/src`:
+```
+npm run
+```
+
+To run backend in `/backend`:
+```
+uvicorn main:app --reload
+```
