@@ -5,8 +5,6 @@ from serpapi import GoogleSearch
 
 def get_flights(flightPref):
     # Get Google Flights API
-    price_min = 500
-    price_max = 3000
     params = {
     "engine": "google_flights",
     "departure_id": flightPref["departureLocation"],
@@ -22,7 +20,11 @@ def get_flights(flightPref):
 
     search = GoogleSearch(params)
     results = search.get_dict()
-    return results
+    try: 
+        return results["best_flights"][0]
+    except KeyError: 
+        return results["other_flights"][0]
+    
 
 def get_hotels(hotel_pref):
     location = hotel_pref['location']
@@ -84,6 +86,7 @@ def update_preferences(preferences):
 
 # Test the functions directly
 api_key = "61e88bc6c438b34f1dcc3391824a0466ca2bfcc4fe6c0e1821a7913d0a5704be"
+
 if __name__ == "__main__":
     preferences = {
         "location": "New York",
@@ -99,8 +102,8 @@ if __name__ == "__main__":
     hotel_data = get_hotels(hotel_pref)
     print("Hotel Data:", hotel_data)
 
-    prefs = {'departureDate' : "2024-08-01", 'departureLocation' : "JFK", 'returnDate' : "2024-08-05", 
-             'returnLocation' : "LAX", 'priceMax' : 1500, 'numPeople' : 3}
+    prefs = {'departureDate' : "2024-07-21", 'departureLocation' : "JFK", 'returnDate' : "2024-07-27", 
+             'returnLocation' : "LAX", 'priceMax' : 5000, 'numPeople' : 1}
     flights = get_flights(prefs)
     print(flights)
 
