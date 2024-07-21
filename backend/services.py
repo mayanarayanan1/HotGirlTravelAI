@@ -2,7 +2,6 @@ import fastapi
 import requests
 from serpapi import GoogleSearch
 
-
 def get_flights(flightPref):
     # Get Google Flights API
     params = {
@@ -57,9 +56,10 @@ def get_hotels(hotel_pref):
 
 def get_flight_pref(preferences):
     attributes = ['departureDate', 'departureLocation', 'returnDate', 'returnLocation', 'priceMax', 'numPeople']
-    flight_pref = {}
+    flight_pref = dict()
     for attribute in attributes:
         if attribute in preferences:
+            print(preferences['departureDate'])
             flight_pref[attribute] = preferences[attribute]
     return flight_pref
 def get_hotel_pref(preferences):
@@ -76,12 +76,10 @@ def get_itinerary_pref(preferences):
         if attribute in preferences:
             itinerary_pref[attribute] = preferences[attribute]
     return itinerary_pref
-def update_preferences(preferences):
-    attributes = ['priceMax', 'busyLevel']
+def update_preferences(price, busy):
     itinerary_pref = {}
-    for attribute in attributes:
-        if attribute in preferences:
-            itinerary_pref[attribute] = preferences[attribute]
+    itinerary_pref['priceMax'] = price
+    itinerary_pref['busyLevel'] = busy
     return itinerary_pref
 
 # Test the functions directly

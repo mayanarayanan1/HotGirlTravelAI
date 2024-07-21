@@ -4,20 +4,25 @@ from openai import OpenAI
 from services import *
 from config import OPENAI_API_KEY
 
+# Set up OpenAI API key
 client = OpenAI(api_key=OPENAI_API_KEY)
 app = FastAPI()
 
 # In-memory storage for user preferences
 user_preferences = {}
 
-# Set up OpenAI API key
+@app.get("/get-itinerary")
+async def get_travel_itinerary(preferences):
+    await load_preferences(preferences)
+    flight_hotels = await find_options()
+    itinerary = await generate_itinerary()
+    return flight_hotels, itinerary
 
 @app.post("/preferences")
 async def load_preferences(preferences):
     global user_preferences
-    user_preferences["preferences"] = preferences
+    user_preferences = preferences
     return {"message": "Preferences loaded successfully"}
-
 
 @app.get("/find-options")
 async def find_options():
@@ -38,21 +43,10 @@ async def find_options():
 
 @app.post("/generate-itinerary")
 async def generate_itinerary():
-
     preferences = user_preferences.get("preferences")
-     # Hardcoded preferences
-    preferences = {
-        "location": "Greece",
-        "numDays": 5,
-        "numPeople": 2,
-        "busyLevel": 3,
-        "dietary": "vegetarian",
-        "isDisability": True
-    }
     if not preferences:
         raise HTTPException(status_code=400, detail="Preferences not set")
     
-   
     destination = preferences["location"]
     days = preferences["numDays"]
     numPeople = preferences["numPeople"]
@@ -77,7 +71,7 @@ async def generate_itinerary():
     return {"itinerary": itinerary}
 
 @app.post("/update-preferences")
-async def update_preferences(update):
+async def update_user_preferences(price, busy):
     global user_preferences
-    user_preferences = update_preferences(update)
+    user_preferences = update_preferences(price, busy)
     return {"message": "Preferences updated successfully"}
