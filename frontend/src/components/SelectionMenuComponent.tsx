@@ -188,7 +188,8 @@ const SearchBarComponent: React.FC = () => {
   const [guests, setGuests] = useState(1);
   const [budget, setBudget] = useState(5000);
   const [activityLevel, setActivityLevel] = useState(3);
-  const [allergy, setAllergy] = useState(false);
+  const [allergy, setAllergy] = useState("");
+  const [cuisine, setCuisine] = useState("");
   const [disability, setDisability] = useState(false);
   const [pets, setPets] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -228,7 +229,8 @@ const SearchBarComponent: React.FC = () => {
         numPeople: guests,
         priceMax: budget,
         busyLevel: activityLevel,
-        hasAllergy: allergy,
+        dietary: allergy,
+        cuisine: cuisine,
         isDisability: disability,
         pets: pets
       };
@@ -243,12 +245,18 @@ const SearchBarComponent: React.FC = () => {
         const { flight_hotels, itinerary } = response.data;
         const { flights, hotels } = flight_hotels;
 
+        const formatDuration = (minutes: number): string => {
+          const hours = Math.floor(minutes / 60);
+          const mins = minutes % 60;
+          return `${hours}h ${mins}m`;
+        };
+
         const flightStrings: string[] = [];
         for (const flight of flights) {
           const flightData = flight as Flight;
           flightStrings.push(`Airline Logo: ${flightData.airline_logo}`);
           flightStrings.push(`Price: $${flightData.price}`);
-          flightStrings.push(`Total Duration: ${flightData.total_duration} minutes`);
+          flightStrings.push(`Total Duration: ${formatDuration(flightData.total_duration)}`);
           flightStrings.push(`Extensions: ${flightData.extensions?.join(', ') || 'None'}`);
           flightStrings.push(`Carbon Emissions: This flight - ${flightData.carbon_emissions.this_flight}g, Typical for this route - ${flightData.carbon_emissions.typical_for_this_route}g, Difference - ${flightData.carbon_emissions.difference_percent}%`);
           flightData.flights.forEach((detail, idx) => {
@@ -416,9 +424,21 @@ const SearchBarComponent: React.FC = () => {
               <div>
                 <Label htmlFor="allergy">Any allergies?</Label>
                 <Input
-                  type="checkbox"
+                  type="text"
                   id="allergy"
-                  onChange={(e) => setAllergy(e.target.checked)}
+                  placeholder="Enter your allergies"
+                  value={allergy}
+                  onChange={(e) => setAllergy(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="cuisine">Preferred Cuisines?</Label>
+                <Input
+                  type="text"
+                  id="cuisine"
+                  placeholder="Enter your preferred cuisines"
+                  value={cuisine}
+                  onChange={(e) => setCuisine(e.target.value)}
                 />
               </div>
             </CheckboxWrapper>

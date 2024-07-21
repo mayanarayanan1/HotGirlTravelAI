@@ -65,23 +65,28 @@ const HotelComponent: React.FC<HotelComponentProps> = ({ hotels }) => {
   return (
     <Container>
       <Heading>Hotels</Heading>
-      {hotels.map((hotel, index) => (
-        <HotelItem key={index}>
-          {hotel.startsWith('Category:') ? (
-            <Category>{toTitleCase(hotel.replace('Category: ', ''))}</Category>
-          ) : hotel.startsWith('Name:') ? (
-            <Name>{hotel.replace('Name: ', '')}</Name>
-          ) : hotel.startsWith('Description:') ? (
-            <Description>{hotel.replace('Description: ', '')}</Description>
-          ) : hotel.startsWith('Link:') ? (
-            <Link href={hotel.replace('Link: ', '')} target="_blank" rel="noopener noreferrer">
-              Visit Website
-            </Link>
-          ) : (
-            <Description>{hotel}</Description>
-          )}
-        </HotelItem>
-      ))}
+      {hotels.map((hotel, index) => {
+        const isDescriptionUndefined =
+          hotel.startsWith('Description:') && hotel.replace('Description: ', '').trim() === 'undefined';
+
+        return (
+          <HotelItem key={index}>
+            {hotel.startsWith('Category:') ? (
+              <Category>{toTitleCase(hotel.replace('Category: ', ''))}</Category>
+            ) : hotel.startsWith('Name:') ? (
+              <Name>{hotel.replace('Name: ', '')}</Name>
+            ) : hotel.startsWith('Description:') && !isDescriptionUndefined ? (
+              <Description>{hotel.replace('Description: ', '')}</Description>
+            ) : hotel.startsWith('Link:') ? (
+              <Link href={hotel.replace('Link: ', '')} target="_blank" rel="noopener noreferrer">
+                Visit Website
+              </Link>
+            ) : (
+              !isDescriptionUndefined && <Description>{hotel}</Description>
+            )}
+          </HotelItem>
+        );
+      })}
     </Container>
   );
 };
