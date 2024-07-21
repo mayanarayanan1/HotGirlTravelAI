@@ -56,7 +56,6 @@ def get_hotels(hotel_pref):
             recommended[filter_name] = results['properties'][0]
         except KeyError:
             recommended[filter_name] = []
-        print(recommended)
     return recommended
 
 def get_flight_pref(preferences):

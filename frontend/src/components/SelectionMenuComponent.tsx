@@ -3,7 +3,20 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import ItineraryComponent from "@/components/ItineraryComponent";
+import HotelComponent from "@/components/HotelComponent"
 import axios from "axios";
+
+interface Hotel {
+  type: string;
+  name: string;
+  description: string;
+  link: string;
+  gps_coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  // Add any other fields you may have
+}
 
 const SearchBarWrapper = styled.div`
   width: 80%;
@@ -143,6 +156,8 @@ const SearchBarComponent: React.FC = () => {
   const [disability, setDisability] = useState(false);
   const [pets, setPets] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [flights, setFlights] = useState("");
+  const [hotels, setHotels] = useState<string[]>([]);
   const [itinerary, setItinerary] = useState("");
   const [displayItinerary, setDisplayItinerary] = useState(false);
   const [messageVisible, setMessageVisible] = useState(false);
@@ -188,9 +203,20 @@ const SearchBarComponent: React.FC = () => {
 
       if (response.status === 200) {
         const { flight_hotels, itinerary } = response.data;
-        console.log(flight_hotels)
-        // setFlightHotels(flight_hotels);
-        console.log(itinerary)
+        const { flights, hotels } = flight_hotels;
+        console.log(flights)
+        console.log(hotels)
+        // setFlights();
+        const hotelStrings = [];
+        for (const [key, hotel] of Object.entries(hotels)) {
+          const hotelData = hotel as Hotel;
+          hotelStrings.push(`Category: ${key}`);
+          hotelStrings.push(`Name: ${hotelData.name}`);
+          hotelStrings.push(`Description: ${hotelData.description}`);
+          hotelStrings.push(`Link: ${hotelData.link}`);
+          hotelStrings.push(''); // Add a blank line for separation
+        }
+        setHotels(hotelStrings);
         setItinerary(itinerary.itinerary.toString());
         setDisplayItinerary(true);
       }
@@ -335,6 +361,9 @@ const SearchBarComponent: React.FC = () => {
           {isExpanded ? "Show Less" : "Show More"}
         </ExpandButton>
       </SearchBarWrapper>
+      {displayItinerary && itinerary && (
+        <HotelComponent hotels={hotels} />
+      )}
       {displayItinerary && itinerary && (
         <ItineraryComponent output={itinerary} />
       )}
