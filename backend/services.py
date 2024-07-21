@@ -1,30 +1,59 @@
 from serpapi import GoogleSearch
+import requests
+
+def get_nearby_airports(city_name):
+    places_url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
+    params = {
+        "query": f"airports near {city_name}",
+        "type": "airport",
+        "key": api_key,
+    }
+    
+    response = requests.get(places_url, params=params)
+    results = response.json().get("results", [])
+    
+    airports = []
+    for result in results:
+        airport_name = result["name"]
+        airport_code = result["place_id"]
+        airports.append((airport_name, airport_code))
+    
+    return airports
 
 def get_flights(flightPref):
-    # Get Google Flights API
-    params = {
-    "engine": "google_flights",
-    "departure_id": flightPref["departureLocation"],
-    "arrival_id": flightPref["returnLocation"],
-    "outbound_date": flightPref["departureDate"],
-    "return_date": flightPref["returnDate"],
-    "currency": "USD",
-    "hl": "en",
-    "api_key": api_key,
-    "adults" : flightPref["numPeople"],
-    "max_price" : flightPref["priceMax"]
-    }
+    departure_airports = get_nearby_airports(flightPref["departureLocation"])
+    arrival_airports = get_nearby_airports(flightPref["returnLocation"])
 
-    search = GoogleSearch(params)
-    results = search.get_dict()
-    try: 
-        return results["best_flights"]
-    except KeyError: 
-        try:
-            return results["other_flights"][0]
-        except KeyError:
-            return []
-    
+    all_flights = []
+
+    for departure_airport in departure_airports:
+        for arrival_airport in arrival_airports:
+            params = {
+                "engine": "google_flights",
+                "departure_id": departure_airport[1],
+                "arrival_id": arrival_airport[1],
+                "outbound_date": flightPref["departureDate"],
+                "return_date": flightPref["returnDate"],
+                "currency": "USD",
+                "hl": "en",
+                "api_key": api_key,
+                "adults": flightPref["numPeople"],
+                "max_price": flightPref["priceMax"]
+            }
+
+            search = GoogleSearch(params)
+            results = search.get_dict()
+            try:
+                flights = results["best_flights"]
+            except KeyError:
+                try:
+                    flights = results["other_flights"]
+                except KeyError:
+                    flights = []
+
+            all_flights.extend(flights)
+
+    return all_flights
 
 def get_hotels(hotel_pref):
     location = hotel_pref['returnLocation']
@@ -91,23 +120,23 @@ def update_preferences(price, busy):
 # Test the functions directly
 api_key = "61e88bc6c438b34f1dcc3391824a0466ca2bfcc4fe6c0e1821a7913d0a5704be"
 
-# if __name__ == "__main__":
-#     preferences = {
-#         "location": "New York",
-#         "arrivalDate": "2024-08-01",
-#         "leaveDate": "2024-08-05",
-#         "numPeople": 2,
-#         "priceMin": 100,
-#         "priceMax": 1000,
-#         'pets': False
-#     }
+if __name__ == "__main__":
+    # preferences = {
+    #     "location": "New York",
+    #     "arrivalDate": "2024-08-01",
+    #     "leaveDate": "2024-08-05",
+    #     "numPeople": 2,
+    #     "priceMin": 100,
+    #     "priceMax": 1000,
+    #     'pets': False
+    # }
 
-#     hotel_pref = get_hotel_pref(preferences)
-#     hotel_data = get_hotels(hotel_pref)
-#     print("Hotel Data:", hotel_data)
+    # hotel_pref = get_hotel_pref(preferences)
+    # hotel_data = get_hotels(hotel_pref)
+    # print("Hotel Data:", hotel_data)
 
-#     prefs = {'departureDate' : "2024-07-21", 'departureLocation' : "JFK", 'returnDate' : "2024-07-27", 
-#              'returnLocation' : "LAX", 'priceMax' : 5000, 'numPeople' : 1}
-#     flights = get_flights(prefs)
-#     print(flights)
+    prefs = {'departureDate' : "2024-07-21", 'departureLocation' : "Seattle", 'returnDate' : "2024-07-27", 
+             'returnLocation' : "New York", 'priceMax' : 5000, 'numPeople' : 1}
+    flights = get_flights(prefs)
+    print(flights)
 
