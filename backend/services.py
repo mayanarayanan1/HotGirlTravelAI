@@ -1,21 +1,20 @@
 from serpapi import GoogleSearch
-import requests
 
 def get_nearby_airports(city_name):
-    places_url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
     params = {
-        "query": f"airports near {city_name}",
+        "engine": "google",
+        "q": f"airports near {city_name}",
         "type": "airport",
-        "key": api_key,
+        "api_key": api_key,
     }
     
-    response = requests.get(places_url, params=params)
-    results = response.json().get("results", [])
+    search = GoogleSearch(params)
+    results = search.get_dict().get("local_results", [])
     
     airports = []
     for result in results:
-        airport_name = result["name"]
-        airport_code = result["place_id"]
+        airport_name = result["title"]
+        airport_code = result.get("place_id", result.get("cid"))
         airports.append((airport_name, airport_code))
     
     return airports
@@ -118,7 +117,7 @@ def update_preferences(price, busy):
     return itinerary_pref
 
 # Test the functions directly
-api_key = "61e88bc6c438b34f1dcc3391824a0466ca2bfcc4fe6c0e1821a7913d0a5704be"
+api_key = "209df4a13be41538b7c69cf7cb9575446df6847e43a47e38ab9c1d2d7692fb13"
 
 if __name__ == "__main__":
     # preferences = {
